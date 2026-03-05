@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using FitStreak.Models.Workout;
+using FitStreak.Core.Models.Workout;
 
-namespace FitStreak.Data;
+namespace FitStreak.Core.Data;
 
 public class AppDbContext : DbContext
 {

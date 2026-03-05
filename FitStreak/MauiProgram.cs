@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Maui;
-using FitStreak.Data;
+using FitStreak.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

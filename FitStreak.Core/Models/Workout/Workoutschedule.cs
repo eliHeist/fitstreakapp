@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace FitStreak.Models.Workout;
+namespace FitStreak.Core.Models.Workout;
 
 public enum RecurrenceType
 {

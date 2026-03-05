@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="FitStreak.Core/FitStreak.Core.csproj" Id="25f26bc4-1714-4254-a115-08a67d148e9c" />
   <Project Path="FitStreak/FitStreak.csproj" />
 </Solution>

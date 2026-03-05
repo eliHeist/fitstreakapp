@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace FitStreak.Data;
+namespace FitStreak.Core.Data;
 
 /// <summary>
 /// Used ONLY by dotnet-ef tooling at design time (migrations, scaffolding).
