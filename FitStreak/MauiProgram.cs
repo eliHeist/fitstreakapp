@@ -52,12 +52,12 @@ public static class MauiProgram
         // ViewModels — registered as Transient (new instance per page navigation)
         // Add each ViewModel here as we build them in Step 7
         // -------------------------------------------------------------------------
-        // builder.Services.AddTransient<HomeViewModel>();
-        // builder.Services.AddTransient<WorkoutsViewModel>();
-        // builder.Services.AddTransient<CreateWorkoutViewModel>();
-        // builder.Services.AddTransient<ScheduleViewModel>();
-        // builder.Services.AddTransient<WorkoutRunnerViewModel>();
-        // builder.Services.AddTransient<StreakViewModel>();
+        builder.Services.AddTransient<HomeViewModel>();
+        builder.Services.AddTransient<WorkoutsViewModel>();
+        builder.Services.AddTransient<CreateWorkoutViewModel>();
+        builder.Services.AddTransient<ScheduleViewModel>();
+        builder.Services.AddTransient<WorkoutRunnerViewModel>();
+        builder.Services.AddTransient<StreakViewModel>();
 
         // -------------------------------------------------------------------------
         // Views — registered as Transient (new instance per navigation)
