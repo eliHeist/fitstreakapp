@@ -1,15 +1,12 @@
 ﻿using CommunityToolkit.Maui;
+using FitStreak.Core.Data;
+using FitStreak.Core.Services;
+using FitStreak.Services;
+using FitStreak.ViewModels;
+using FitStreak.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Plugin.LocalNotification;
-
-using FitStreak.Core.Data;
-using FitStreak.Core.Services;
-
-using FitStreak.Services;
-
-using FitStreak.ViewModels;
-using FitStreak.ViewModels.Base;
 
 namespace FitStreak;
 
@@ -37,20 +34,18 @@ public static class MauiProgram
 
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite($"Data Source={dbPath}"),
-            ServiceLifetime.Singleton);  // Singleton — one DB connection for the app lifetime
+            ServiceLifetime.Singleton);
 
         // -------------------------------------------------------------------------
-        // Services — registered in FitStreak.Core
-        // Add each service here as we build them in Step 6
+        // Services — all in FitStreak.Core except NotificationService
         // -------------------------------------------------------------------------
         builder.Services.AddSingleton<IWorkoutService, WorkoutService>();
         builder.Services.AddSingleton<IScheduleService, ScheduleService>();
         builder.Services.AddSingleton<IStreakService, StreakService>();
-        builder.Services.AddSingleton<FitStreak.Core.Services.INotificationService, FitStreak.Services.NotificationService>();
+        builder.Services.AddSingleton<FitStreak.Core.Services.INotificationService, NotificationService>();
 
         // -------------------------------------------------------------------------
-        // ViewModels — registered as Transient (new instance per page navigation)
-        // Add each ViewModel here as we build them in Step 7
+        // ViewModels — Transient so each page navigation gets a fresh instance
         // -------------------------------------------------------------------------
         builder.Services.AddTransient<HomeViewModel>();
         builder.Services.AddTransient<WorkoutsViewModel>();
@@ -60,15 +55,14 @@ public static class MauiProgram
         builder.Services.AddTransient<StreakViewModel>();
 
         // -------------------------------------------------------------------------
-        // Views — registered as Transient (new instance per navigation)
-        // Add each View here as we build them in Step 8
+        // Views — Transient, one per navigation
         // -------------------------------------------------------------------------
-        // builder.Services.AddTransient<HomePage>();
-        // builder.Services.AddTransient<WorkoutsPage>();
-        // builder.Services.AddTransient<CreateWorkoutPage>();
-        // builder.Services.AddTransient<SchedulePage>();
-        // builder.Services.AddTransient<WorkoutRunnerPage>();
-        // builder.Services.AddTransient<StreakPage>();
+        builder.Services.AddTransient<HomePage>();
+        builder.Services.AddTransient<WorkoutsPage>();
+        builder.Services.AddTransient<CreateWorkoutPage>();
+        builder.Services.AddTransient<SchedulePage>();
+        builder.Services.AddTransient<WorkoutRunnerPage>();
+        builder.Services.AddTransient<StreakPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="FitStreak.Views.HomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:FitStreak.Converters"
+    xmlns:models="clr-namespace:FitStreak.Core.Models.Workout;assembly=FitStreak.Core"
+    xmlns:vm="clr-namespace:FitStreak.ViewModels"
+    x:DataType="vm:HomeViewModel"
+    BackgroundColor="#0F0F0F">
+
+    <ContentPage.Resources>
+        <converters:StatusToColorConverter x:Key="StatusToColor" />
+        <converters:StatusToIconConverter x:Key="StatusToIcon" />
+        <converters:InverseBoolConverter x:Key="InverseBool" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="24">
+
+            <!-- =========================================================
+                 Header
+                 ========================================================= -->
+            <Grid ColumnDefinitions="*,Auto" Margin="0,16,0,0">
+                <VerticalStackLayout Grid.Column="0">
+                    <Label
+                        Text="TODAY"
+                        FontSize="11"
+                        FontAttributes="Bold"
+                        CharacterSpacing="3"
+                        TextColor="#666666" />
+                    <Label
+                        Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='{0:dddd, MMM d}'}"
+                        FontSize="26"
+                        FontAttributes="Bold"
+                        TextColor="#FFFFFF"
+                        xmlns:sys="clr-namespace:System;assembly=mscorlib" />
+                </VerticalStackLayout>
+
+                <!-- Streak badge -->
+                <Border
+                    Grid.Column="1"
+                    BackgroundColor="#1A1A1A"
+                    Stroke="#2A2A2A"
+                    StrokeThickness="1"
+                    Padding="12,8"
+                    VerticalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    <HorizontalStackLayout Spacing="6">
+                        <Label Text="🔥" FontSize="18" VerticalOptions="Center" />
+                        <VerticalStackLayout VerticalOptions="Center">
+                            <Label
+                                Text="{Binding CurrentStreak}"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                TextColor="#39D353" />
+                            <Label
+                                Text="day streak"
+                                FontSize="10"
+                                TextColor="#666666" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- =========================================================
+                 Stats Row
+                 ========================================================= -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Border
+                    Grid.Column="0"
+                    BackgroundColor="#1A1A1A"
+                    Stroke="#2A2A2A"
+                    StrokeThickness="1"
+                    Padding="16,14">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout>
+                        <Label Text="TOTAL DONE" FontSize="10" CharacterSpacing="2" TextColor="#666666" FontAttributes="Bold" />
+                        <Label Text="{Binding TotalCompletions}" FontSize="28" FontAttributes="Bold" TextColor="#FFFFFF" />
+                        <Label Text="workouts" FontSize="11" TextColor="#444444" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border
+                    Grid.Column="1"
+                    BackgroundColor="#1A1A1A"
+                    Stroke="#2A2A2A"
+                    StrokeThickness="1"
+                    Padding="16,14">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout>
+                        <Label Text="TODAY" FontSize="10" CharacterSpacing="2" TextColor="#666666" FontAttributes="Bold" />
+                        <Label Text="{Binding TodaySchedules.Count}" FontSize="28" FontAttributes="Bold" TextColor="#FFFFFF" />
+                        <Label Text="scheduled" FontSize="11" TextColor="#444444" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- =========================================================
+                 Missed Workouts Banner
+                 ========================================================= -->
+            <Border
+                IsVisible="{Binding HasMissed}"
+                BackgroundColor="#2D1515"
+                Stroke="#F44336"
+                StrokeThickness="1"
+                Padding="16,14">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="14" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <HorizontalStackLayout Spacing="8">
+                        <Label Text="❌" FontSize="16" VerticalOptions="Center" />
+                        <Label
+                            Text="{Binding MissedSchedules.Count, StringFormat='{0} missed workout(s)'}"
+                            FontSize="15"
+                            FontAttributes="Bold"
+                            TextColor="#F44336"
+                            VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                    <CollectionView ItemsSource="{Binding MissedSchedules}" HeightRequest="60">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:WorkoutSchedule">
+                                <HorizontalStackLayout Spacing="12" Padding="0,4">
+                                    <Label
+                                        Text="{Binding Workout.Name}"
+                                        FontSize="13"
+                                        TextColor="#CCCCCC"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        Text="{Binding ScheduledDate, StringFormat='{0:MMM d}'}"
+                                        FontSize="12"
+                                        TextColor="#666666"
+                                        VerticalOptions="Center" />
+                                    <Button
+                                        Text="Reschedule"
+                                        FontSize="12"
+                                        BackgroundColor="#3D1515"
+                                        TextColor="#F44336"
+                                        Padding="10,4"
+                                        CornerRadius="8"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=RescheduleCommand}"
+                                        CommandParameter="{Binding .}" />
+                                </HorizontalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- =========================================================
+                 Today's Workouts
+                 ========================================================= -->
+            <Label
+                Text="SCHEDULED TODAY"
+                FontSize="11"
+                FontAttributes="Bold"
+                CharacterSpacing="3"
+                TextColor="#666666" />
+
+            <!-- Empty state -->
+            <Border
+                IsVisible="{Binding TodaySchedules.Count, Converter={StaticResource InverseBool}}"
+                BackgroundColor="#1A1A1A"
+                Stroke="#2A2A2A"
+                StrokeThickness="1"
+                Padding="24">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="14" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                    <Label Text="💤" FontSize="36" HorizontalOptions="Center" />
+                    <Label Text="Nothing scheduled today" FontSize="15" TextColor="#666666" HorizontalOptions="Center" />
+                    <Label Text="Head to Schedule to add workouts" FontSize="12" TextColor="#444444" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Workouts list -->
+            <CollectionView ItemsSource="{Binding TodaySchedules}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:WorkoutSchedule">
+                        <Border
+                            BackgroundColor="#1A1A1A"
+                            Stroke="#2A2A2A"
+                            StrokeThickness="1"
+                            Padding="16"
+                            Margin="0,0,0,12">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="16" />
+                            </Border.StrokeShape>
+                            <VerticalStackLayout Spacing="12">
+
+                                <!-- Top row: name + status -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout Grid.Column="0">
+                                        <Label
+                                            Text="{Binding Workout.Name}"
+                                            FontSize="17"
+                                            FontAttributes="Bold"
+                                            TextColor="#FFFFFF" />
+                                        <Label
+                                            Text="{Binding RecurrenceType, StringFormat='Repeats {0}'}"
+                                            FontSize="12"
+                                            TextColor="#555555" />
+                                    </VerticalStackLayout>
+
+                                    <!-- Status badge -->
+                                    <Border
+                                        Grid.Column="1"
+                                        BackgroundColor="{Binding Status, Converter={StaticResource StatusToColor}}"
+                                        Padding="10,4"
+                                        VerticalOptions="Start">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8" />
+                                        </Border.StrokeShape>
+                                        <HorizontalStackLayout Spacing="4">
+                                            <Label Text="{Binding Status, Converter={StaticResource StatusToIcon}}" FontSize="12" />
+                                            <Label Text="{Binding Status}" FontSize="11" TextColor="#FFFFFF" FontAttributes="Bold" />
+                                        </HorizontalStackLayout>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Divider -->
+                                <BoxView HeightRequest="1" BackgroundColor="#2A2A2A" />
+
+                                <!-- Action buttons -->
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                    <Button
+                                        Grid.Column="0"
+                                        Text="▶  Start"
+                                        BackgroundColor="#1E3A1E"
+                                        TextColor="#39D353"
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        CornerRadius="10"
+                                        Padding="0,10"
+                                        IsEnabled="{Binding IsCompleted, Converter={StaticResource InverseBool}}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=StartWorkoutCommand}"
+                                        CommandParameter="{Binding .}" />
+
+                                    <Button
+                                        Grid.Column="1"
+                                        Text="✓  Complete"
+                                        BackgroundColor="#1A2D1A"
+                                        TextColor="#4CAF50"
+                                        FontSize="14"
+                                        CornerRadius="10"
+                                        Padding="0,10"
+                                        IsEnabled="{Binding IsCompleted, Converter={StaticResource InverseBool}}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=CompleteWorkoutCommand}"
+                                        CommandParameter="{Binding Id}" />
+                                </Grid>
+
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Loading indicator -->
+            <ActivityIndicator
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="#39D353"
+                HorizontalOptions="Center" />
+
+            <!-- Error message -->
+            <Label
+                IsVisible="{Binding HasError}"
+                Text="{Binding ErrorMessage}"
+                TextColor="#F44336"
+                FontSize="13"
+                HorizontalOptions="Center" />
+
+            <BoxView HeightRequest="20" Color="Transparent" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

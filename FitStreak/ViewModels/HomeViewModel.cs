@@ -52,6 +52,13 @@ public partial class HomeViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    public async Task StartWorkoutAsync(WorkoutSchedule schedule)
+    {
+        await Shell.Current.GoToAsync(
+            $"WorkoutRunnerPage?workoutId={schedule.WorkoutId}&scheduleId={schedule.Id}");
+    }
+
+    [RelayCommand]
     public async Task CompleteWorkoutAsync(int scheduleId)
     {
         await RunSafeAsync(async () =>

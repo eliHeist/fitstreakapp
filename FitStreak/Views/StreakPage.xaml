@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="FitStreak.Views.StreakPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:FitStreak.Converters"
+    xmlns:vm="clr-namespace:FitStreak.ViewModels"
+    x:DataType="vm:StreakViewModel"
+    BackgroundColor="#0F0F0F">
+
+    <ContentPage.Resources>
+        <converters:StreakCountToColorConverter x:Key="StreakCountToColor" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="24">
+
+            <!-- Header -->
+            <VerticalStackLayout Spacing="4" Margin="0,16,0,0">
+                <Label Text="ACTIVITY" FontSize="11" FontAttributes="Bold" CharacterSpacing="3" TextColor="#666666" />
+                <Label Text="Streaks" FontSize="28" FontAttributes="Bold" TextColor="#FFFFFF" />
+            </VerticalStackLayout>
+
+            <!-- =========================================================
+                 Stats Row
+                 ========================================================= -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+
+                <Border Grid.Column="0" BackgroundColor="#1A1A1A" Stroke="#2A2A2A" StrokeThickness="1" Padding="14,12">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout>
+                        <Label Text="🔥" FontSize="22" HorizontalOptions="Center" />
+                        <Label Text="{Binding CurrentStreak}" FontSize="24" FontAttributes="Bold" TextColor="#39D353" HorizontalOptions="Center" />
+                        <Label Text="current" FontSize="10" TextColor="#555555" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="1" BackgroundColor="#1A1A1A" Stroke="#2A2A2A" StrokeThickness="1" Padding="14,12">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout>
+                        <Label Text="🏆" FontSize="22" HorizontalOptions="Center" />
+                        <Label Text="{Binding LongestStreak}" FontSize="24" FontAttributes="Bold" TextColor="#FFA500" HorizontalOptions="Center" />
+                        <Label Text="longest" FontSize="10" TextColor="#555555" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="2" BackgroundColor="#1A1A1A" Stroke="#2A2A2A" StrokeThickness="1" Padding="14,12">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout>
+                        <Label Text="✅" FontSize="22" HorizontalOptions="Center" />
+                        <Label Text="{Binding TotalCompletions}" FontSize="24" FontAttributes="Bold" TextColor="#FFFFFF" HorizontalOptions="Center" />
+                        <Label Text="total" FontSize="10" TextColor="#555555" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </Grid>
+
+            <!-- =========================================================
+                 Heatmap — rendered from code-behind
+                 The ScrollView allows horizontal scrolling for the full year
+                 ========================================================= -->
+            <Border BackgroundColor="#1A1A1A" Stroke="#2A2A2A" StrokeThickness="1" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="12">
+                    <HorizontalStackLayout>
+                        <Label Text="PAST YEAR" FontSize="10" CharacterSpacing="2" TextColor="#666666" FontAttributes="Bold" />
+                    </HorizontalStackLayout>
+
+                    <!-- Heatmap grid is built in code-behind and added here -->
+                    <ScrollView Orientation="Horizontal">
+                        <Grid x:Name="HeatmapGrid" />
+                    </ScrollView>
+
+                    <!-- Legend -->
+                    <HorizontalStackLayout Spacing="6" HorizontalOptions="End">
+                        <Label Text="Less" FontSize="10" TextColor="#555555" VerticalOptions="Center" />
+                        <BoxView WidthRequest="10" HeightRequest="10" BackgroundColor="#1E1E1E" CornerRadius="2" />
+                        <BoxView WidthRequest="10" HeightRequest="10" BackgroundColor="#0E4429" CornerRadius="2" />
+                        <BoxView WidthRequest="10" HeightRequest="10" BackgroundColor="#006D32" CornerRadius="2" />
+                        <BoxView WidthRequest="10" HeightRequest="10" BackgroundColor="#26A641" CornerRadius="2" />
+                        <BoxView WidthRequest="10" HeightRequest="10" BackgroundColor="#39D353" CornerRadius="2" />
+                        <Label Text="More" FontSize="10" TextColor="#555555" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Selected day detail -->
+            <Border
+                IsVisible="{Binding HasSelectedDay}"
+                BackgroundColor="#1A1A1A"
+                Stroke="#39D353"
+                StrokeThickness="1"
+                Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="14" />
+                </Border.StrokeShape>
+                <HorizontalStackLayout Spacing="12">
+                    <Label Text="📅" FontSize="24" VerticalOptions="Center" />
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label Text="{Binding SelectedDay, StringFormat='{0:MMMM d, yyyy}'}" FontSize="15" FontAttributes="Bold" TextColor="#FFFFFF" />
+                        <Label Text="{Binding SelectedDayCount, StringFormat='{0} workout(s) completed'}" FontSize="13" TextColor="#39D353" />
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- Loading -->
+            <ActivityIndicator
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="#39D353"
+                HorizontalOptions="Center" />
+
+            <BoxView HeightRequest="20" Color="Transparent" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using FitStreak.Core.Models.Workout;
 using FitStreak.Core.Services;
 using FitStreak.ViewModels.Base;
+using FitStreak.Views;
 using System.Collections.ObjectModel;
 
 namespace FitStreak.ViewModels;
@@ -42,5 +43,17 @@ public partial class WorkoutsViewModel : BaseViewModel
             await _workoutService.DeleteWorkoutAsync(id);
             await LoadAsync();
         });
+    }
+
+    [RelayCommand]
+    public async Task EditWorkoutAsync(int id)
+    {
+        await Shell.Current.GoToAsync($"EditWorkout?workoutId={id}");
+    }
+
+    [RelayCommand]
+    public async Task CreateWorkoutAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(CreateWorkoutPage));
     }
 }

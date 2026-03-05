@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="FitStreak.Views.WorkoutRunnerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:FitStreak.Converters"
+    xmlns:vm="clr-namespace:FitStreak.ViewModels"
+    x:DataType="vm:WorkoutRunnerViewModel"
+    BackgroundColor="#0A0A0A"
+    Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <converters:SecondsToTimeStringConverter x:Key="SecondsToTime" />
+        <converters:InverseBoolConverter x:Key="InverseBool" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+
+        <!-- =========================================================
+             Top bar
+             ========================================================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,52,20,16">
+            <Button
+                Grid.Column="0"
+                Text="✕ Quit"
+                BackgroundColor="#1A1A1A"
+                TextColor="#888888"
+                FontSize="13"
+                CornerRadius="10"
+                Padding="12,8"
+                Command="{Binding AbandonWorkoutCommand}" />
+
+            <Label
+                Grid.Column="1"
+                Text="{Binding Title}"
+                FontSize="16"
+                FontAttributes="Bold"
+                TextColor="#FFFFFF"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+
+            <Label
+                Grid.Column="2"
+                Text="{Binding CurrentIndex, StringFormat='{0}'}"
+                FontSize="13"
+                TextColor="#555555"
+                VerticalOptions="Center">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="{Binding CurrentIndex}" TextColor="#FFFFFF" FontAttributes="Bold" />
+                        <Span Text=" / " TextColor="#444444" />
+                        <Span Text="{Binding TotalExercises}" TextColor="#555555" />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </Grid>
+
+        <!-- =========================================================
+             Main timer area
+             ========================================================= -->
+        <VerticalStackLayout
+            Grid.Row="1"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            Spacing="16"
+            Padding="20">
+
+            <!-- Rest / Exercise label -->
+            <Border
+                BackgroundColor="{Binding IsResting, Converter={StaticResource InverseBool}}"
+                Padding="16,6"
+                HorizontalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsResting}" Value="True">
+                        <Setter Property="BackgroundColor" Value="#1A2D1A" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsResting}" Value="False">
+                        <Setter Property="BackgroundColor" Value="#1A1A2E" />
+                    </DataTrigger>
+                </Border.Triggers>
+                <Label
+                    Text="REST"
+                    FontSize="12"
+                    FontAttributes="Bold"
+                    CharacterSpacing="3"
+                    TextColor="#39D353"
+                    IsVisible="{Binding IsResting}">
+                </Label>
+            </Border>
+
+            <!-- Exercise name -->
+            <Label
+                Text="{Binding CurrentExercise.Name}"
+                FontSize="32"
+                FontAttributes="Bold"
+                TextColor="#FFFFFF"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                IsVisible="{Binding IsCompleted, Converter={StaticResource InverseBool}}" />
+
+            <!-- Completion screen -->
+            <VerticalStackLayout
+                IsVisible="{Binding IsCompleted}"
+                Spacing="12"
+                HorizontalOptions="Center">
+                <Label Text="🎉" FontSize="64" HorizontalOptions="Center" />
+                <Label Text="Workout Complete!" FontSize="28" FontAttributes="Bold" TextColor="#39D353" HorizontalOptions="Center" />
+                <Label Text="Amazing work. Keep the streak going." FontSize="15" TextColor="#666666" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Big timer -->
+            <Label
+                Text="{Binding SecondsRemaining, Converter={StaticResource SecondsToTime}}"
+                FontSize="96"
+                FontAttributes="Bold"
+                TextColor="#FFFFFF"
+                HorizontalOptions="Center"
+                IsVisible="{Binding IsCompleted, Converter={StaticResource InverseBool}}" />
+
+            <!-- Progress bar -->
+            <ProgressBar
+                Progress="{Binding Progress}"
+                ProgressColor="#39D353"
+                BackgroundColor="#1A1A1A"
+                HeightRequest="6"
+                WidthRequest="280" />
+
+            <!-- Exercise notes -->
+            <Label
+                Text="{Binding CurrentExercise.Notes}"
+                FontSize="14"
+                TextColor="#555555"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                IsVisible="{Binding IsCompleted, Converter={StaticResource InverseBool}}" />
+
+        </VerticalStackLayout>
+
+        <!-- =========================================================
+             Next up preview
+             ========================================================= -->
+        <Border
+            Grid.Row="2"
+            BackgroundColor="#141414"
+            Stroke="#2A2A2A"
+            StrokeThickness="1"
+            Padding="20,14"
+            Margin="20,0"
+            IsVisible="{Binding IsCompleted, Converter={StaticResource InverseBool}}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="14" />
+            </Border.StrokeShape>
+            <HorizontalStackLayout Spacing="12">
+                <Label Text="NEXT" FontSize="10" CharacterSpacing="2" TextColor="#444444" FontAttributes="Bold" VerticalOptions="Center" />
+                <Label
+                    Text="{Binding NextExercise.Name}"
+                    FontSize="15"
+                    TextColor="#888888"
+                    VerticalOptions="Center"
+                    IsVisible="{Binding NextExercise, Converter={StaticResource InverseBool}}" />
+                <Label
+                    Text="Last exercise"
+                    FontSize="15"
+                    TextColor="#555555"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
+
+        <!-- =========================================================
+             Bottom buttons
+             ========================================================= -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,*" Padding="20,16,20,36" ColumnSpacing="12">
+
+            <!-- Skip button — only when not complete -->
+            <Button
+                Grid.Column="0"
+                Text="Skip ▶"
+                BackgroundColor="#1A1A1A"
+                TextColor="#888888"
+                FontSize="15"
+                CornerRadius="14"
+                Padding="0,16"
+                IsVisible="{Binding IsCompleted, Converter={StaticResource InverseBool}}"
+                Command="{Binding SkipCurrentCommand}" />
+
+            <!-- Complete button — spans both columns when workout done -->
+            <Button
+                Grid.Column="1"
+                Grid.ColumnSpan="{Binding IsCompleted, Converter={StaticResource InverseBool}}"
+                Text="✓ Complete Workout"
+                BackgroundColor="#39D353"
+                TextColor="#0F0F0F"
+                FontAttributes="Bold"
+                FontSize="16"
+                CornerRadius="14"
+                Padding="0,16"
+                Command="{Binding CompleteWorkoutCommand}" />
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

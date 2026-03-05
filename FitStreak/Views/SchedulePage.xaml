@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="FitStreak.Views.SchedulePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:FitStreak.Converters"
+    xmlns:models="clr-namespace:FitStreak.Core.Models.Workout;assembly=FitStreak.Core"
+    xmlns:vm="clr-namespace:FitStreak.ViewModels"
+    x:DataType="vm:ScheduleViewModel"
+    BackgroundColor="#0F0F0F">
+
+    <ContentPage.Resources>
+        <converters:StatusToColorConverter x:Key="StatusToColor" />
+        <converters:StatusToIconConverter x:Key="StatusToIcon" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="24">
+
+            <!-- Header -->
+            <VerticalStackLayout Spacing="4" Margin="0,16,0,0">
+                <Label Text="PLANNER" FontSize="11" FontAttributes="Bold" CharacterSpacing="3" TextColor="#666666" />
+                <Label Text="Schedule" FontSize="28" FontAttributes="Bold" TextColor="#FFFFFF" />
+            </VerticalStackLayout>
+
+            <!-- =========================================================
+                 Date Picker
+                 ========================================================= -->
+            <Border BackgroundColor="#1A1A1A" Stroke="#2A2A2A" StrokeThickness="1" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="SELECT DATE" FontSize="10" CharacterSpacing="2" TextColor="#666666" FontAttributes="Bold" />
+                    <DatePicker
+                        Date="{Binding SelectedDate}"
+                        TextColor="#FFFFFF"
+                        BackgroundColor="Transparent"
+                        Format="dddd, MMMM d yyyy"
+                        FontSize="16" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- =========================================================
+                 Add Schedule Form
+                 ========================================================= -->
+            <Border BackgroundColor="#1A1A1A" Stroke="#2A2A2A" StrokeThickness="1" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="16">
+
+                    <Label Text="ASSIGN WORKOUT" FontSize="10" CharacterSpacing="2" TextColor="#666666" FontAttributes="Bold" />
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Workout" FontSize="13" TextColor="#888888" />
+                        <Border BackgroundColor="#111111" Stroke="#333333" StrokeThickness="1" Padding="4,0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10" />
+                            </Border.StrokeShape>
+                            <Picker
+                                ItemsSource="{Binding AvailableWorkouts}"
+                                SelectedItem="{Binding SelectedWorkout}"
+                                ItemDisplayBinding="{Binding Name}"
+                                Title="Choose a workout"
+                                TitleColor="#444444"
+                                TextColor="#FFFFFF"
+                                BackgroundColor="Transparent" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Repeat" FontSize="13" TextColor="#888888" />
+                        <Border BackgroundColor="#111111" Stroke="#333333" StrokeThickness="1" Padding="4,0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10" />
+                            </Border.StrokeShape>
+                            <Picker
+                                ItemsSource="{Binding RecurrenceOptions}"
+                                SelectedItem="{Binding SelectedRecurrence}"
+                                TextColor="#FFFFFF"
+                                BackgroundColor="Transparent" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <Button
+                        Text="+ Schedule Workout"
+                        BackgroundColor="#1E3A1E"
+                        TextColor="#39D353"
+                        FontAttributes="Bold"
+                        FontSize="15"
+                        CornerRadius="12"
+                        Padding="0,14"
+                        Command="{Binding AddScheduleCommand}" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- =========================================================
+                 Schedules for Selected Date
+                 ========================================================= -->
+            <Label
+                Text="{Binding SelectedDate, StringFormat='SCHEDULED FOR {0:MMM d}'}"
+                FontSize="10"
+                FontAttributes="Bold"
+                CharacterSpacing="2"
+                TextColor="#666666" />
+
+            <CollectionView ItemsSource="{Binding SchedulesForSelectedDate}" SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Spacing="8" Padding="0,16">
+                        <Label Text="📅" FontSize="32" HorizontalOptions="Center" />
+                        <Label Text="Nothing scheduled" FontSize="15" TextColor="#555555" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:WorkoutSchedule">
+                        <Border
+                            BackgroundColor="#1A1A1A"
+                            Stroke="#2A2A2A"
+                            StrokeThickness="1"
+                            Padding="14,12"
+                            Margin="0,0,0,10">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="14" />
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+
+                                <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                    <Label Text="{Binding Workout.Name}" FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF" />
+                                    <HorizontalStackLayout Spacing="8" Margin="0,3,0,0">
+                                        <Label Text="{Binding Status, Converter={StaticResource StatusToIcon}}" FontSize="12" />
+                                        <Label Text="{Binding Status}" FontSize="12" TextColor="{Binding Status, Converter={StaticResource StatusToColor}}" />
+                                        <Label Text="·" FontSize="12" TextColor="#444444" />
+                                        <Label Text="{Binding RecurrenceType}" FontSize="12" TextColor="#555555" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+
+                                <Button
+                                    Grid.Column="1"
+                                    Text="Move"
+                                    FontSize="12"
+                                    BackgroundColor="#1A1A2E"
+                                    TextColor="#2196F3"
+                                    Padding="10,6"
+                                    CornerRadius="8"
+                                    Margin="0,0,8,0"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ScheduleViewModel}}, Path=ShowRescheduleCommand}"
+                                    CommandParameter="{Binding .}" />
+
+                                <Button
+                                    Grid.Column="2"
+                                    Text="🗑"
+                                    FontSize="14"
+                                    BackgroundColor="#2D1515"
+                                    TextColor="#F44336"
+                                    Padding="10,6"
+                                    CornerRadius="8"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ScheduleViewModel}}, Path=DeleteScheduleCommand}"
+                                    CommandParameter="{Binding Id}" />
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Loading -->
+            <ActivityIndicator
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="#39D353"
+                HorizontalOptions="Center" />
+
+            <BoxView HeightRequest="20" Color="Transparent" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

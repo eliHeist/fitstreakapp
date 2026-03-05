@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="FitStreak.Views.WorkoutsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:FitStreak.Converters"
+    xmlns:models="clr-namespace:FitStreak.Core.Models.Workout;assembly=FitStreak.Core"
+    xmlns:vm="clr-namespace:FitStreak.ViewModels"
+    x:DataType="vm:WorkoutsViewModel"
+    BackgroundColor="#0F0F0F">
+
+    <ContentPage.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBool" />
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Text="+ New"
+            Command="{Binding CreateWorkoutCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,24,20,12">
+            <Label
+                Text="LIBRARY"
+                FontSize="11"
+                FontAttributes="Bold"
+                CharacterSpacing="3"
+                TextColor="#666666" />
+            <Label
+                Text="Workouts"
+                FontSize="28"
+                FontAttributes="Bold"
+                TextColor="#FFFFFF" />
+        </VerticalStackLayout>
+
+        <!-- Empty state -->
+        <VerticalStackLayout
+            Grid.Row="1"
+            IsVisible="{Binding IsEmpty}"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            Spacing="12">
+            <Label Text="🏋️" FontSize="52" HorizontalOptions="Center" />
+            <Label Text="No workouts yet" FontSize="18" FontAttributes="Bold" TextColor="#666666" HorizontalOptions="Center" />
+            <Label Text="Tap + New to create your first workout" FontSize="13" TextColor="#444444" HorizontalOptions="Center" />
+            <Button
+                Text="Create Workout"
+                BackgroundColor="#1E3A1E"
+                TextColor="#39D353"
+                FontAttributes="Bold"
+                CornerRadius="12"
+                Padding="24,12"
+                Margin="0,8,0,0"
+                Command="{Binding CreateWorkoutCommand}" />
+        </VerticalStackLayout>
+
+        <!-- Workouts list -->
+        <CollectionView
+            Grid.Row="1"
+            IsVisible="{Binding IsEmpty, Converter={StaticResource InverseBool}}"
+            ItemsSource="{Binding Workouts}"
+            SelectionMode="None"
+            Margin="20,0">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Workout">
+                    <Border
+                        BackgroundColor="#1A1A1A"
+                        Stroke="#2A2A2A"
+                        StrokeThickness="1"
+                        Padding="16"
+                        Margin="0,0,0,12">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="16" />
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+
+                            <!-- Workout name -->
+                            <Label
+                                Grid.Row="0" Grid.Column="0"
+                                Text="{Binding Name}"
+                                FontSize="17"
+                                FontAttributes="Bold"
+                                TextColor="#FFFFFF" />
+
+                            <!-- Exercise count -->
+                            <Label
+                                Grid.Row="1" Grid.Column="0"
+                                Text="{Binding Exercises.Count, StringFormat='{0} exercises'}"
+                                FontSize="12"
+                                TextColor="#555555"
+                                Margin="0,2,0,0" />
+
+                            <!-- Created date -->
+                            <Label
+                                Grid.Row="2" Grid.Column="0"
+                                Text="{Binding CreatedAt, StringFormat='Created {0:MMM d, yyyy}'}"
+                                FontSize="11"
+                                TextColor="#444444"
+                                Margin="0,4,0,0" />
+
+                            <!-- Action buttons -->
+                            <HorizontalStackLayout
+                                Grid.Row="0" Grid.Column="1"
+                                Grid.RowSpan="3"
+                                Spacing="8"
+                                VerticalOptions="Center">
+
+                                <Button
+                                    Text="Edit"
+                                    FontSize="12"
+                                    BackgroundColor="#1A1A2E"
+                                    TextColor="#2196F3"
+                                    Padding="12,6"
+                                    CornerRadius="8"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WorkoutsViewModel}}, Path=EditWorkoutCommand}"
+                                    CommandParameter="{Binding Id}" />
+
+                                <Button
+                                    Text="🗑"
+                                    FontSize="14"
+                                    BackgroundColor="#2D1515"
+                                    TextColor="#F44336"
+                                    Padding="10,6"
+                                    CornerRadius="8"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WorkoutsViewModel}}, Path=DeleteWorkoutCommand}"
+                                    CommandParameter="{Binding Id}" />
+                            </HorizontalStackLayout>
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Loading -->
+        <ActivityIndicator
+            Grid.Row="1"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}"
+            Color="#39D353"
+            VerticalOptions="Center"
+            HorizontalOptions="Center" />
+
+    </Grid>
+
+</ContentPage>
