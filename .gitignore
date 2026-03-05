@@ -1,0 +1,46 @@
+﻿## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build Results
+[Bb]in/
+[Oo]bj/
+*.pidb
+*.log
+*.tmp
+*.tlog
+*.cache
+*.deps.json
+*.runtimeconfig.json
+
+## Entity Framework Core
+Migrations/*.Designer.cs
+# (Note: Keep the Designer.cs if you prefer, but usually you only need the .cs and .resx)
+
+## NuGet
+packages/
+*.nupkg
+
+## Test/Coverage
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+## MAUI / Android / iOS / MacCatalyst Specifics
+.gradle/
+.local/
+*.apk
+*.aab
+*.ipa
+obj/
+bin/
+*.p12
+*.provisionprofile
+
+## OS Specific
+.DS_Store
+Thumbs.db
