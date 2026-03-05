@@ -1,7 +1,15 @@
 ﻿using CommunityToolkit.Maui;
-using FitStreak.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Plugin.LocalNotification;
+
+using FitStreak.Core.Data;
+using FitStreak.Core.Services;
+
+using FitStreak.Services;
+
+using FitStreak.ViewModels;
+using FitStreak.ViewModels.Base;
 
 namespace FitStreak;
 
@@ -14,6 +22,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
+            .UseLocalNotification()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -34,10 +43,10 @@ public static class MauiProgram
         // Services — registered in FitStreak.Core
         // Add each service here as we build them in Step 6
         // -------------------------------------------------------------------------
-        // builder.Services.AddSingleton<IWorkoutService, WorkoutService>();
-        // builder.Services.AddSingleton<IScheduleService, ScheduleService>();
-        // builder.Services.AddSingleton<IStreakService, StreakService>();
-        // builder.Services.AddSingleton<INotificationService, NotificationService>();
+        builder.Services.AddSingleton<IWorkoutService, WorkoutService>();
+        builder.Services.AddSingleton<IScheduleService, ScheduleService>();
+        builder.Services.AddSingleton<IStreakService, StreakService>();
+        builder.Services.AddSingleton<FitStreak.Core.Services.INotificationService, FitStreak.Services.NotificationService>();
 
         // -------------------------------------------------------------------------
         // ViewModels — registered as Transient (new instance per page navigation)
