@@ -6,6 +6,7 @@
     xmlns:converters="clr-namespace:FitStreak.Converters"
     xmlns:models="clr-namespace:FitStreak.Core.Models.Workout;assembly=FitStreak.Core"
     xmlns:vm="clr-namespace:FitStreak.ViewModels"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     x:DataType="vm:HomeViewModel"
     BackgroundColor="#0F0F0F">
 
@@ -33,8 +34,7 @@
                         Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='{0:dddd, MMM d}'}"
                         FontSize="26"
                         FontAttributes="Bold"
-                        TextColor="#FFFFFF"
-                        xmlns:sys="clr-namespace:System;assembly=mscorlib" />
+                        TextColor="#FFFFFF" />
                 </VerticalStackLayout>
 
                 <!-- Streak badge -->

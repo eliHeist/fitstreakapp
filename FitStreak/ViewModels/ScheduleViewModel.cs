@@ -95,21 +95,16 @@ public partial class ScheduleViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public async Task RescheduleAsync(WorkoutSchedule schedule, DateTime newDate)
+    public async Task RescheduleAsync((WorkoutSchedule Schedule, DateTime NewDate) args)
     {
         await RunSafeAsync(async () =>
         {
-            // Cancel old notifications
-            await _notificationService.CancelNotificationsAsync(schedule.Id);
-
-            await _scheduleService.RescheduleAsync(schedule.Id, newDate);
-
-            // Schedule new notifications for the new date
+            await _notificationService.CancelNotificationsAsync(args.Schedule.Id);
+            await _scheduleService.RescheduleAsync(args.Schedule.Id, args.NewDate);
             await _notificationService.ScheduleWorkoutReminderAsync(
-                schedule.Id, schedule.Workout!.Name, newDate);
+                args.Schedule.Id, args.Schedule.Workout!.Name, args.NewDate);
             await _notificationService.ScheduleEveningReminderAsync(
-                schedule.Id, schedule.Workout!.Name, newDate);
-
+                args.Schedule.Id, args.Schedule.Workout!.Name, args.NewDate);
             await LoadSchedulesForDateAsync();
         });
     }

@@ -1,9 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Android.Text;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FitStreak.Core.Models.Workout;
 using FitStreak.Core.Services;
 using FitStreak.ViewModels.Base;
-using System;
 
 namespace FitStreak.ViewModels;
 
@@ -16,32 +16,20 @@ public partial class WorkoutRunnerViewModel : BaseViewModel
     private IDispatcherTimer? _timer;
     private int _scheduleId;
 
-    // -------------------------------------------------------------------------
-    // Current state
-    // -------------------------------------------------------------------------
-    [ObservableProperty]
-    private Exercise? _currentExercise;
+    [ObservableProperty] private Exercise? _currentExercise;
+    [ObservableProperty] private Exercise? _nextExercise;
+    [ObservableProperty] private int _secondsRemaining;
+    [ObservableProperty] private bool _isResting;
+    [ObservableProperty] private bool _isCompleted;
+    [ObservableProperty] private int _currentIndex;
+    [ObservableProperty] private int _totalExercises;
+    [ObservableProperty] private double _progress;
 
     [ObservableProperty]
-    private Exercise? _nextExercise;
+    [NotifyPropertyChangedFor(nameof(PauseButtonText))]
+    private bool _isPaused;
 
-    [ObservableProperty]
-    private int _secondsRemaining;
-
-    [ObservableProperty]
-    private bool _isResting;
-
-    [ObservableProperty]
-    private bool _isCompleted;
-
-    [ObservableProperty]
-    private int _currentIndex;
-
-    [ObservableProperty]
-    private int _totalExercises;
-
-    [ObservableProperty]
-    private double _progress; // 0.0 to 1.0 for progress bar
+    public string PauseButtonText => _isPaused ? "▶ Resume" : "⏸ Pause";
 
     public WorkoutRunnerViewModel(
         IWorkoutService workoutService,
@@ -61,6 +49,7 @@ public partial class WorkoutRunnerViewModel : BaseViewModel
             TotalExercises = _exercises.Count;
             CurrentIndex = 0;
             IsCompleted = false;
+            IsPaused = false;
 
             if (_exercises.Count > 0)
                 StartExercise(0);
@@ -79,6 +68,7 @@ public partial class WorkoutRunnerViewModel : BaseViewModel
         CurrentExercise = _exercises[index];
         NextExercise = index + 1 < _exercises.Count ? _exercises[index + 1] : null;
         IsResting = false;
+        IsPaused = false;
         SecondsRemaining = CurrentExercise.DurationSeconds;
         Progress = (double)index / TotalExercises;
 
@@ -87,16 +77,25 @@ public partial class WorkoutRunnerViewModel : BaseViewModel
 
     private void StartRest(int afterIndex)
     {
+        // Guard: if no next exercise, finish instead
+        if (afterIndex + 1 >= _exercises.Count)
+        {
+            FinishWorkout();
+            return;
+        }
+
         var exercise = _exercises[afterIndex];
         if (exercise.RestAfterSeconds <= 0)
         {
-            // No rest — go straight to next exercise
             StartExercise(afterIndex + 1);
             return;
         }
 
         IsResting = true;
+        IsPaused = false;
         SecondsRemaining = exercise.RestAfterSeconds;
+        // Keep CurrentIndex pointing at the exercise we just finished
+        // so OnTimerTick knows which exercise comes next
         StartTimer();
     }
 
@@ -111,8 +110,9 @@ public partial class WorkoutRunnerViewModel : BaseViewModel
 
     private void OnTimerTick(object? sender, EventArgs e)
     {
-        SecondsRemaining--;
+        if (IsPaused) return;
 
+        SecondsRemaining--;
         if (SecondsRemaining > 0) return;
 
         _timer?.Stop();
@@ -124,9 +124,16 @@ public partial class WorkoutRunnerViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    public void TogglePause()
+    {
+        IsPaused = !IsPaused;
+    }
+
+    [RelayCommand]
     public void SkipCurrent()
     {
         _timer?.Stop();
+        IsPaused = false;
 
         if (IsResting)
             StartExercise(CurrentIndex + 1);
@@ -148,18 +155,14 @@ public partial class WorkoutRunnerViewModel : BaseViewModel
     public void AbandonWorkout()
     {
         _timer?.Stop();
-        // Navigation back is handled in the View
-        // No DB update — session is just discarded
     }
 
     private void FinishWorkout()
     {
+        _timer?.Stop();
         IsCompleted = true;
         Progress = 1.0;
         CurrentExercise = null;
         NextExercise = null;
     }
-
-    // Formatted time string for display e.g. "0:45"
-    public string TimeDisplay => $"{SecondsRemaining / 60}:{SecondsRemaining % 60:D2}";
 }

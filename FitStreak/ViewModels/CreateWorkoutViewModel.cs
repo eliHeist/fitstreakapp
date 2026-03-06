@@ -51,6 +51,7 @@ public partial class CreateWorkoutViewModel : BaseViewModel
     }
 
     /// <summary>Call this when editing an existing workout</summary>
+    [RelayCommand]
     public async Task LoadForEditAsync(int workoutId)
     {
         await RunSafeAsync(async () =>

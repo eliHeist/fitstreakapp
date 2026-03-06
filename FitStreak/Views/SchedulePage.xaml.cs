@@ -34,6 +34,6 @@ public partial class SchedulePage : ContentPage
         if (DateTime.TryParse(result, out DateTime newDate))
             await _viewModel.RescheduleCommand.ExecuteAsync((schedule, newDate));
         else
-            await DisplayAlert("Invalid Date", "Please enter a valid date.", "OK");
+            await DisplayAlertAsync("Invalid Date", "Please enter a valid date.", "OK");
     }
 }
