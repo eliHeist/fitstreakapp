@@ -109,27 +109,34 @@ public partial class CreateWorkoutViewModel : BaseViewModel
     {
         if (string.IsNullOrWhiteSpace(WorkoutName)) return;
 
+        if (Exercises.Count == 0)
+        {
+            ErrorMessage = "Add at least one exercise before saving.";
+            HasError = true;
+            return;
+        }
+
         await RunSafeAsync(async () =>
         {
             if (_existingWorkout is null)
             {
-                // Create new workout with all exercises
                 var workout = new Workout
                 {
                     Name = WorkoutName,
                     Description = WorkoutDescription,
                     Exercises = Exercises.ToList()
                 };
-
                 await _workoutService.CreateWorkoutAsync(workout);
             }
             else
             {
-                // Update existing workout details
                 _existingWorkout.Name = WorkoutName;
                 _existingWorkout.Description = WorkoutDescription;
                 await _workoutService.UpdateWorkoutAsync(_existingWorkout);
             }
+
+            // Navigate to Workouts tab and pop this page
+            await Shell.Current.GoToAsync("//WorkoutsPage");
         });
     }
 

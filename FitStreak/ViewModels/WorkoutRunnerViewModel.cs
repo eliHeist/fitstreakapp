@@ -149,6 +149,7 @@ public partial class WorkoutRunnerViewModel : BaseViewModel
         Progress = 1.0;
 
         await _scheduleService.CompleteScheduleAsync(_scheduleId);
+        await Shell.Current.GoToAsync("//WorkoutsPage");
     }
 
     [RelayCommand]
